@@ -1,4 +1,5 @@
 package longo;
+import java.io.Serializable;
 import java.util.Scanner;
 import longo.App.Command;
 public class App {
@@ -18,14 +19,14 @@ public class App {
         PROCESS, 	// See the queue and help the first person in the queue
         QUIT 		// Exit from the program
     }
-    public static Command enterCommand() {
+    public static Command commandLine() {
 		return null; 	
     }
 	public static void main(String[] args) {
 		showHeader();
 		Scanner scanner = new Scanner(System.in);
 		String commandLine = scanner.nextLine();
-		Command com = enterCommand();
+		Command com = commandLine;
 			switch (com) {
 				case PUT:
 					put(commandLine);
@@ -53,16 +54,19 @@ public class App {
 	 * @param person person have to be max 10 character and contains only small case letters
 	 * @return True if valid false otherwise
 	 */
-	public static boolean nameIsValid(String person) {
-		String[] shareString = enterCommand.split(" ");
+	public static boolean 	nameIsValid(String person) {
+		String[] shareString = enterCommand.split(" "); 
+		//checks if there is an input command in the string
 		for (String s : shareString){
 			if (s.equals(("put")||("reset")||("process")||("quit")){
 				enterCommand = s;
 			}
+			//check if you have a maximum of 10 characters per name
 			if (s.length() < 11){
 				System.out.println(invalidNameErrorMessage);
 				return enterCommand() != null;
 			}
+			//check if there are no uppercase characters in the string
 			if (s.toUpperCase() != null){
 				System.out.println(invalidNameErrorMessage);
 			}
@@ -93,16 +97,33 @@ public class App {
 		}
 		}
 	}
+	public static void decreaseArray(){
+		int i = 0;
+		while (queue[i] != "-"){
+			queue[i] = queue[i+1];
+		}
+		String queueDecrease = "-";
+		queue[i] = queueDecrease;
+	}
 	/**
 	 * Put a person on the Queue
 	 */
-	public static void put(String person) {
-		
+	public static void put(){
+		nameIsValid(person);
+		if ( = true){
+			for (int i = 0; queue[i] = "-"; queue[i++]){
+				if queue[i] = queue[7]{
+					return true;
+				}
+			}
+		}
 	}
 	/**
 	 * Help the next client
 	 */
 	public static void process() {
+		decreaseArray();
+		showHeader();
 	}
 	/**
 	 * Exit application
