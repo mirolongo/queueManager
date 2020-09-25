@@ -1,46 +1,89 @@
 package longo;
-import java.io.Serializable;
 import java.util.Scanner;
-import longo.App.Command;
 public class App {
+	// Declaration of variables
 	static String invalidNameErrorMessage = " is an invalid person name. Skipping this person";
 	static String invalidCommandErrorMessage = "Invalid Command, Try again";
-	static String[] queue = new String[8]; //{"-","-","-","-","-","-","-","-"};
+	static String[] queue = { "-", "-", "-", "-", "-", "-", "-", "-" };
 	static String checkout = "CHECKOUT <-";
 	static String enterCommand = "Enter a Command:";
 	static String fullQueue1 = "Could not add ";
 	static String fullQueue2 = " to queue because the queue is full.";
 	static String quitMessage = "Exiting.";
 	static String separator = "----------------------------";
-	static String person = null;	
-    enum Command {
-        PUT, 		// insert new client in the queue
-        RESET, 		// reset the queue
-        PROCESS, 	// See the queue and help the first person in the queue
-        QUIT 		// Exit from the program
-    }
-    public static Command commandLine() {
-		return null; 	
-    }
+	public enum Command {
+		PUT, // insert new client in the queue
+		RESET, // reset the queue
+		PROCESS, // See the queue and help the first person in the queue
+		QUIT, // Exit from the program
+		INVALID; // Invalid Command
+	}
 	public static void main(String[] args) {
-		showHeader();
-		Scanner scanner = new Scanner(System.in);
-		String commandLine = scanner.nextLine();
-		Command com = commandLine;
-			switch (com) {
-				case PUT:
-					put(commandLine);
-				case RESET:
-					reset();
-				case PROCESS:
-					process();
-				case QUIT:
-					quit();
+		Command command = Command.INVALID;
+		while (command != Command.QUIT) {
+			showHeader();
+			Scanner scanner = new Scanner(System.in);
+			String commandLine = scanner.nextLine();
+			command = readCommand(commandLine);
+			switch (command) {
+			case INVALID:
+				System.out.println(invalidCommandErrorMessage);
+				showHeader();
+				break;
+			case PUT:
+				String[] names = extractNames(commandLine);
+				for (int i = 0; i < names.length; i++) {
+					put(names[i]);
+				}
+				break;
+			case QUIT:
+				quit();
+				break;
+			case RESET:
+				reset();
+				break;
+			case PROCESS:
+				process();
+				break;
 			}
 		}
+	}
+	private static String[] extractNames(String commandLine) {
+		String[] shareString = commandLine.split(" ");
+		String validNames = "";
+		for (int i = 1; i < shareString.length; i++) {
+			if (shareString[i].isEmpty()) {
+				continue;
+			}
+			if (nameIsValid(shareString[i])) {
+				validNames = validNames + shareString[i] + ",";
+			}
+		}
+		String[] names = validNames.split(",");
+		return names;
+	}
+	private static Command readCommand(String commandLine) {
+		Command parsedCommand = Command.INVALID;
+		String[] shareString = commandLine.split(" ");
+		String command = shareString[0];
+		if (command.equals("put")) {
+			parsedCommand = Command.PUT;
+		}
+		if (command.equals("reset")) {
+			parsedCommand = Command.RESET;
+		}
+		if (command.equals("process")) {
+			parsedCommand = Command.PROCESS;
+		}
+		if (command.equals("quit")) {
+			parsedCommand = Command.QUIT;
+		}
+		return parsedCommand;
+	}
+	//Show the header of application
 	private static void showHeader() {
 		System.out.print(checkout);
-		for (int i =0; i<queue.length;i++) {
+		for (int i = 0; i < queue.length; i++) {
 			System.out.print("|" + queue[i]);
 		}
 		System.out.print("|");
@@ -51,80 +94,75 @@ public class App {
 	}
 	/**
 	 * Validates person
-	 * @param person person have to be max 10 character and contains only small case letters
+	 * 
+	 * @param person person have to be max 10 character and contains only small case
+	 *               letters
 	 * @return True if valid false otherwise
 	 */
-	public static boolean 	nameIsValid(String person) {
-		String[] shareString = enterCommand.split(" "); 
-		//checks if there is an input command in the string
-		for (String s : shareString){
-			if (s.equals(("put")||("reset")||("process")||("quit")){
-				enterCommand = s;
+	public static boolean nameIsValid(String name) {
+		// checks if there is an input command in the string
+		// check if name has a maximum of 10 characters
+		if (name.length() > 10) {
+			System.out.println(name + invalidNameErrorMessage);
+			return false;
+		}
+		// check if there are no uppercase characters in the string
+		for (int i = 0; i < name.length(); i++) {
+			char current = name.charAt(i);
+			char currentUpperCase = Character.toUpperCase(current);
+			if (current == currentUpperCase) {
+				System.out.println(name + invalidNameErrorMessage);
+				return false;
 			}
-			//check if you have a maximum of 10 characters per name
-			if (s.length() < 11){
-				System.out.println(invalidNameErrorMessage);
-				return enterCommand() != null;
-			}
-			//check if there are no uppercase characters in the string
-			if (s.toUpperCase() != null){
-				System.out.println(invalidNameErrorMessage);
-			}
-			else{
-			return true;
-			}		
 		}
 		return true;
 	}
+
 	/**
 	 * Reset Queue
 	 */
 	public static void reset() {
-		for (int i = 0; i<8; i++){
-			queue[i] = "-";
-		}
-		}
+		queue = new String[] { "-", "-", "-", "-", "-", "-", "-", "-" };
+	}
+
 	/**
 	 * Confirm number of the persons on the queue
 	 */
-	public static void fullArray() {
-		for (int i = 0; i<8; i++){
-			if (queue[i].equals("-")){
-				queue[i] = person;
+	public static int findFreeSlotOnQueue() {
+		for (int i = 0; i < queue.length; i++) {
+			if (queue[i].equals("-")) {
+				return i;
 			}
-			else{
-			System.out.println(fullQueue1 + person + fullQueue2);
 		}
-		}
+		return -1;
 	}
-	public static void decreaseArray(){
-		int i = 0;
-		while (queue[i] != "-"){
-			queue[i] = queue[i+1];
-		}
-		String queueDecrease = "-";
-		queue[i] = queueDecrease;
-	}
+
 	/**
 	 * Put a person on the Queue
 	 */
-	public static void put(){
-		nameIsValid(person);
-		if ( = true){
-			for (int i = 0; queue[i] = "-"; queue[i++]){
-				if queue[i] = queue[7]{
-					return true;
-				}
-			}
+	public static void put(String name) {
+		if (name.isEmpty()) {
+			return;
+		}
+		int freeSlot = findFreeSlotOnQueue();
+		if (freeSlot > -1) {
+			queue[freeSlot] = name;
+		} else {
+			System.out.println(fullQueue1 + name + fullQueue2);
 		}
 	}
+
 	/**
 	 * Help the next client
 	 */
 	public static void process() {
-		decreaseArray();
-		showHeader();
+		String[] newQueue = new String[] { "-", "-", "-", "-", "-", "-", "-", "-" };
+		for (int i = 1; i < queue.length; i++) {
+			newQueue[i - 1] = queue[i];
+		}
+		queue = newQueue;
 	}
+
 	/**
 	 * Exit application
 	 */
